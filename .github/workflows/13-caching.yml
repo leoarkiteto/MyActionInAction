@@ -19,12 +19,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '20.x'
 
+      - name: Download cached dependencies
+        uses: actions/cache@v4
+        if: ${{inputs.use-cache}}
+        id: cache
+        with:
+          path: 13-caching/vue-app/node_modules
+          key: deps-node-modules-${{hashFiles('13-caching/vue-app/package-lock.json')}}
+
       - name: Install dependencies
+        if: ${{steps.cache.outputs.cache-hit != 'true'}}
         run: npm ci
 
       - name: Linting
